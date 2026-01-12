@@ -1,0 +1,7 @@
+{
+  "name": "Aura AI Fashion Assistant",
+  "description": "An integrated AI-powered fashion platform for wardrobe styling, creative garment design, and high-end handmade marketplace shopping.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
