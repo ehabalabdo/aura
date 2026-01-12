@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { User, Language } from '../types';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../src/firebase/auth';
 
 interface AuthModalProps {
   onLogin: (user: User) => void;
@@ -9,44 +11,67 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
   const [isAdminMode, setIsAdminMode] = useState(false);
-  const [adminUsername, setAdminUsername] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const t = {
     en: {
       title: "Welcome to Aura",
-      sub: isAdminMode ? "Secure Access" : "Sign in to start your styling journey",
+      sub: isAdminMode ? "Admin Secure Access" : "Sign in to start your styling journey",
       userGoogle: "Continue with Google",
-      adminToggle: "Login",
+      adminToggle: "Admin Login",
       userToggle: "Back",
-      username: "Username",
+      email: "Email",
       password: "Password",
       login: "Login",
-      invalid: "Invalid credentials. Try 'admin' / 'admin123'",
-      brand: "AURA FASHION AI"
+      invalid: "Invalid credentials",
+      brand: "AURA FASHION AI",
+      logging: "Logging in..."
     },
     ar: {
       title: "مرحباً بك في أورا",
-      sub: isAdminMode ? "دخول آمن" : "سجل دخولك لتبدأ رحلة الأناقة",
+      sub: isAdminMode ? "دخول المدير الآمن" : "سجل دخولك لتبدأ رحلة الأناقة",
       userGoogle: "المتابعة باستخدام جوجل",
-      adminToggle: "دخول",
+      adminToggle: "دخول المدير",
       userToggle: "رجوع",
-      username: "اسم المستخدم",
+      email: "البريد الإلكتروني",
       password: "كلمة المرور",
       login: "تسجيل الدخول",
-      invalid: "بيانات غير صحيحة. جرب 'admin' و 'admin123'",
-      brand: "أورا لذكاء الأزياء"
+      invalid: "بيانات غير صحيحة",
+      brand: "أورا لذكاء الأزياء",
+      logging: "جاري تسجيل الدخول..."
     }
   }[lang];
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple mock admin check
-    if (adminUsername === 'admin' && adminPassword === 'admin123') {
-      onLogin({ id: 'a1', name: 'System Admin', role: 'admin' });
-    } else {
-      setError(t.invalid);
+    setError('');
+    setLoading(true);
+    
+    try {
+      const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase();
+      const credential = await signInWithEmailAndPassword(auth, adminEmail.trim(), adminPassword);
+      
+      // Check if email matches admin email
+      if (ADMIN_EMAIL && credential.user.email?.toLowerCase() !== ADMIN_EMAIL) {
+        setError(lang === 'en' ? 'Not authorized as admin' : 'غير مصرح كمدير');
+        await auth.signOut();
+        setLoading(false);
+        return;
+      }
+      
+      onLogin({ 
+        id: credential.user.uid, 
+        name: credential.user.email?.split('@')[0] || 'Admin', 
+        role: 'admin' 
+      });
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || t.invalid);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,14 +131,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
               {error && <p className="text-[10px] text-red-500 font-bold bg-red-50 p-2 text-center uppercase tracking-tighter">{error}</p>}
               
               <input 
-                type="text" 
-                placeholder={t.username}
+                type="email" 
+                placeholder={t.email}
                 className="w-full p-4 bg-gray-50 border-none text-xs rounded focus:ring-1 focus:ring-amber-200"
-                value={adminUsername}
-                onChange={(e) => setAdminUsername(e.target.value)}
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
                 required
               />
-
+              
               <input 
                 type="password" 
                 placeholder={t.password}
@@ -122,12 +147,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
                 onChange={(e) => setAdminPassword(e.target.value)}
                 required
               />
-
+              
               <button 
                 type="submit"
-                className="w-full py-4 bg-gray-900 text-white text-[10px] uppercase font-bold tracking-[0.3em] hover:bg-amber-600 transition-all shadow-lg rounded"
+                disabled={loading}
+                className="w-full py-4 bg-gray-900 text-white text-[10px] uppercase font-bold tracking-[0.3em] hover:bg-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t.login}
+                {loading ? t.logging : t.login}
               </button>
 
               <button 
