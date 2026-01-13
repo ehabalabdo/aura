@@ -3,15 +3,15 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../src/firebase/auth';
 import { db } from '../src/firebase/db';
-import { Language, User } from '../types';
+import { Language } from '../types';
 
 interface RegisterProps {
-  onSuccess: (user: User) => void;
+  onClose: () => void;
   onSwitchToLogin: () => void;
   lang: Language;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitchToLogin, lang }) => {
+const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin, lang }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -79,7 +79,8 @@ const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitchToLogin, lang })
         createdAt: serverTimestamp()
       });
 
-      onSuccess({ uid: user.uid, email: user.email || '', role: 'user' });
+      // useAuth hook in App.tsx will handle redirect
+      onClose();
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed');

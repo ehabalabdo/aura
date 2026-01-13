@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../src/firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../src/firebase/db';
-import { Language, User } from '../types';
+import { Language } from '../types';
 
 interface LoginProps {
-  onSuccess: (user: User) => void;
+  onClose: () => void;
   onSwitchToRegister: () => void;
   lang: Language;
 }
 
-const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToRegister, lang }) => {
+const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,16 +46,9 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToRegister, lang }) =>
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
-      const user = userCredential.user;
-
-      // Get user data from Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const userData = userDoc.data();
-
-      if (userDoc.exists() && userData) {
-        onSuccess({ uid: user.uid, email: user.email || '', role: userData.role });
-      }
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      // useAuth hook in App.tsx will handle redirect
+      onClose();
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || t.invalid);
