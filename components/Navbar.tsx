@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppView, Language, User } from '../types';
 import Login from './Login';
 import Register from './Register';
@@ -20,6 +20,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
   const [isOpen, setIsOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+
+  // Auto-close modals when user logs in
+  useEffect(() => {
+    if (user) {
+      setShowLogin(false);
+      setShowRegister(false);
+    }
+  }, [user]);
 
   const navLinks = [
     { label: 'Home', labelAr: 'الرئيسية', view: AppView.Home, roles: ['admin', 'user', null] },
@@ -162,7 +170,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               </svg>
             </button>
             <Login 
-              onSuccess={() => setShowLogin(false)} 
+              onClose={() => setShowLogin(false)} 
               onSwitchToRegister={() => { setShowLogin(false); setShowRegister(true); }}
               lang={lang}
             />
@@ -182,7 +190,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               </svg>
             </button>
             <Register 
-              onSuccess={() => setShowRegister(false)} 
+              onClose={() => setShowRegister(false)}
               onSwitchToLogin={() => { setShowRegister(false); setShowLogin(true); }}
               lang={lang}
             />

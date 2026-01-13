@@ -57,6 +57,17 @@ const App: React.FC = () => {
 
   const [cart, setCart] = useState<MarketProduct[]>([]);
 
+  // Auto-redirect based on authentication state and role
+  useEffect(() => {
+    if (!authLoading && currentUser) {
+      if (currentUser.role === 'admin') {
+        setCurrentView(AppView.AdminPortal);
+      } else {
+        setCurrentView(AppView.Dashboard);
+      }
+    }
+  }, [currentUser, authLoading]);
+
   useEffect(() => {
     localStorage.setItem(S_PRODUCTS, JSON.stringify(boutiqueProducts));
   }, [boutiqueProducts]);

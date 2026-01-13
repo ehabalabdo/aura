@@ -4,12 +4,12 @@ import { auth } from '../src/firebase/auth';
 import { Language } from '../types';
 
 interface LoginProps {
-  onSuccess: () => void;
+  onClose: () => void;
   onSwitchToRegister: () => void;
   lang: Language;
 }
 
-const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToRegister, lang }) => {
+const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,11 +47,10 @@ const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToRegister, lang }) =>
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      onSuccess();
+      // Don't call onClose - let App.tsx handle redirect
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || t.invalid);
-    } finally {
       setLoading(false);
     }
   };

@@ -6,12 +6,12 @@ import { db } from '../src/firebase/db';
 import { Language } from '../types';
 
 interface RegisterProps {
-  onSuccess: () => void;
+  onClose: () => void;
   onSwitchToLogin: () => void;
   lang: Language;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitchToLogin, lang }) => {
+const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin, lang }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -79,11 +79,10 @@ const Register: React.FC<RegisterProps> = ({ onSuccess, onSwitchToLogin, lang })
         createdAt: serverTimestamp()
       });
 
-      onSuccess();
+      // Don't call onClose - let App.tsx handle redirect
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed');
-    } finally {
       setLoading(false);
     }
   };
