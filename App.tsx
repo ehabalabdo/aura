@@ -8,7 +8,6 @@ import Atelier from './components/Atelier';
 import Boutique from './components/Boutique';
 import Dashboard from './components/Dashboard';
 import AdminPortal from './components/AdminPortal';
-import AuthModal from './components/AuthModal';
 import CartModal from './components/CartModal';
 import { MARKET_PRODUCTS as INITIAL_PRODUCTS } from './constants';
 
@@ -144,9 +143,10 @@ const App: React.FC = () => {
       <Navbar 
         currentView={currentView} setView={setCurrentView} lang={language} setLang={setLanguage} 
         user={currentUser} onLogout={() => { setCurrentUser(null); setCurrentView(AppView.Home); }}
+        onLogin={setCurrentUser}
         cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)}
       />
-      {!currentUser && currentView === AppView.Home && <AuthModal onLogin={setCurrentUser} lang={language} />}
+      
       <CartModal 
         isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} 
         cart={cart} setCart={setCart} onPlaceOrder={placeOrder} lang={language} 
