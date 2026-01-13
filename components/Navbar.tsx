@@ -149,6 +149,22 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
                 {lang === 'en' ? link.label : link.labelAr}
               </button>
             ))}
+            {!user && (
+              <>
+                <button 
+                  onClick={() => { setShowLogin(true); setIsOpen(false); }}
+                  className="block w-full text-left rtl:text-right px-3 py-4 text-sm font-medium text-amber-600 border-b border-gray-50"
+                >
+                  {lang === 'en' ? 'Login' : 'تسجيل دخول'}
+                </button>
+                <button 
+                  onClick={() => { setShowRegister(true); setIsOpen(false); }}
+                  className="block w-full text-left rtl:text-right px-3 py-4 text-sm font-medium text-amber-600 border-b border-gray-50"
+                >
+                  {lang === 'en' ? 'Register' : 'إنشاء حساب'}
+                </button>
+              </>
+            )}
             {user && (
               <button onClick={onLogout} className="block w-full text-left rtl:text-right px-3 py-4 text-sm font-medium text-red-500">
                 {lang === 'en' ? 'Logout' : 'تسجيل خروج'}
