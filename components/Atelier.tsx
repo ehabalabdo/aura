@@ -15,7 +15,7 @@ const Atelier: React.FC<AtelierProps> = ({ lang }) => {
 
   const t = {
     en: {
-      title: "The Atelier",
+      title: "Design",
       sub: "Co-create unique garments with AI. Budget in JOD.",
       vision: "Design Vision",
       place: "Describe your garment... e.g. A silk midi dress with heritage patterns.",
@@ -33,7 +33,7 @@ const Atelier: React.FC<AtelierProps> = ({ lang }) => {
       currency: "JOD"
     },
     ar: {
-      title: "الأتيليه",
+      title: "تصميم",
       sub: "شارك الذكاء الاصطناعي في ابتكار تصاميمك. الميزانية بالدينار.",
       vision: "رؤية التصميم",
       place: "صف القطعة المرادة... مثال: فستان حريري بألوان الصحراء.",
