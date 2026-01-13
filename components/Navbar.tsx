@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { AppView, Language, User } from '../types';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../src/firebase/auth';
+import Login from './Login';
+import Register from './Register';
 
 interface NavbarProps {
   currentView: AppView;
@@ -18,12 +18,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, user, onLogout, onLogin, cartCount, onOpenCart }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [adminPanelOpen, setAdminPanelOpen] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
-  const [adminError, setAdminError] = useState('');
-  const [adminLoading, setAdminLoading] = useState(false);
-  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase();
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const navLinks = [
     { label: 'Home', labelAr: 'الرئيسية', view: AppView.Home, roles: ['admin', 'user', null] },
@@ -71,64 +67,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               {!user && (
                 <>
                   <button 
-                    onClick={() => onLogin({ id: 'user-' + Date.now(), name: 'Guest', role: 'user' })}
+                    onClick={() => setShowLogin(true)}
                     className="text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-amber-600 transition-colors"
                   >
                     {lang === 'en' ? 'Login' : 'تسجيل دخول'}
                   </button>
-                  <div className="relative">
-                    <button 
-                      onClick={() => { setAdminPanelOpen(!adminPanelOpen); setAdminError(''); }}
-                      className="text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-amber-600 transition-colors"
-                    >
-                      {lang === 'en' ? 'Admin' : 'مدير'}
-                    </button>
-                    {adminPanelOpen && (
-                      <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded shadow-lg p-4 z-50">
-                        {adminError && <p className="text-[10px] text-red-500 font-bold bg-red-50 p-2 text-center uppercase tracking-tighter mb-2">{adminError}</p>}
-                        <input
-                          type="email"
-                          placeholder={lang === 'en' ? 'Email' : 'البريد الإلكتروني'}
-                          className="w-full p-2 bg-gray-50 border border-gray-200 text-xs rounded mb-2"
-                          value={adminEmail}
-                          onChange={(e) => setAdminEmail(e.target.value)}
-                        />
-                        <input
-                          type="password"
-                          placeholder={lang === 'en' ? 'Password' : 'كلمة المرور'}
-                          className="w-full p-2 bg-gray-50 border border-gray-200 text-xs rounded mb-2"
-                          value={adminPassword}
-                          onChange={(e) => setAdminPassword(e.target.value)}
-                        />
-                        <button
-                          onClick={async () => {
-                            setAdminError('');
-                            setAdminLoading(true);
-                            try {
-                              const credential = await signInWithEmailAndPassword(auth, adminEmail.trim(), adminPassword);
-                              const email = credential.user.email?.toLowerCase();
-                              if (ADMIN_EMAIL && email !== ADMIN_EMAIL) {
-                                setAdminError(lang === 'en' ? 'Not authorized as admin' : 'غير مصرح كمدير');
-                                await auth.signOut();
-                                setAdminLoading(false);
-                                return;
-                              }
-                              onLogin({ id: credential.user.uid, name: credential.user.email?.split('@')[0] || 'Admin', role: 'admin' });
-                              setAdminPanelOpen(false);
-                            } catch (err: any) {
-                              setAdminError(err?.message || (lang === 'en' ? 'Invalid credentials' : 'بيانات غير صحيحة'));
-                            } finally {
-                              setAdminLoading(false);
-                            }
-                          }}
-                          disabled={adminLoading}
-                          className="w-full py-2 bg-gray-900 text-white text-[10px] uppercase font-bold tracking-[0.2em] rounded hover:bg-amber-600 transition-all disabled:opacity-50"
-                        >
-                          {adminLoading ? (lang === 'en' ? 'Signing in…' : 'جاري الدخول…') : (lang === 'en' ? 'Admin Login' : 'دخول المدير')}
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <button 
+                    onClick={() => setShowRegister(true)}
+                    className="text-[9px] uppercase tracking-widest font-bold text-amber-600 hover:text-amber-700 transition-colors"
+                  >
+                    {lang === 'en' ? 'Register' : 'إنشاء حساب'}
+                  </button>
                 </>
               )}
               {user?.role === 'user' && (
@@ -197,6 +146,46 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
                 {lang === 'en' ? 'Logout' : 'تسجيل خروج'}
               </button>
             )}
+          </div>
+        </div>
+      )}
+      
+      {showLogin && (
+        <div className="fixed inset-0 z-[200] bg-black/50">
+          <div className="relative">
+            <button 
+              onClick={() => setShowLogin(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-[201]"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <Login 
+              onSuccess={() => setShowLogin(false)} 
+              onSwitchToRegister={() => { setShowLogin(false); setShowRegister(true); }}
+              lang={lang}
+            />
+          </div>
+        </div>
+      )}
+
+      {showRegister && (
+        <div className="fixed inset-0 z-[200] bg-black/50">
+          <div className="relative">
+            <button 
+              onClick={() => setShowRegister(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 z-[201]"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <Register 
+              onSuccess={() => setShowRegister(false)} 
+              onSwitchToLogin={() => { setShowRegister(false); setShowLogin(true); }}
+              lang={lang}
+            />
           </div>
         </div>
       )}

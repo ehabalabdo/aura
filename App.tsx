@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AppView, ClosetItem, Language, User, MarketProduct, Order } from './types';
+import { useAuth } from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Wardrobe from './components/Wardrobe';
@@ -12,6 +13,7 @@ import CartModal from './components/CartModal';
 import { MARKET_PRODUCTS as INITIAL_PRODUCTS } from './constants';
 
 const App: React.FC = () => {
+  const { currentUser, loading: authLoading, setCurrentUser } = useAuth();
   const [language, setLanguage] = useState<Language>('ar');
   const [currentView, setCurrentView] = useState<AppView>(AppView.Home);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -19,13 +21,7 @@ const App: React.FC = () => {
 
   const S_PRODUCTS = 'fitfusion_products_v4';
   const S_CLOSET = 'fitfusion_closet_v4';
-  const S_USER = 'fitfusion_user_v4';
   const S_ORDERS = 'fitfusion_orders_v4';
-
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(S_USER);
-    return saved ? JSON.parse(saved) : null;
-  });
 
   const [closetItems, setClosetItems] = useState<ClosetItem[]>(() => {
     const saved = localStorage.getItem(S_CLOSET);
@@ -72,14 +68,6 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(S_ORDERS, JSON.stringify(orders));
   }, [orders]);
-
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem(S_USER, JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem(S_USER);
-    }
-  }, [currentUser]);
 
   const globalDelete = (id: string) => {
     setBoutiqueProducts(prev => prev.filter(p => p.id !== id));
@@ -137,6 +125,17 @@ const App: React.FC = () => {
       default: return <Home setView={setCurrentView} lang={language} />;
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">{language === 'en' ? 'Loading...' : 'جاري التحميل...'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen flex flex-col bg-[#fafafa] ${language === 'ar' ? 'rtl' : 'ltr font-sans'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
