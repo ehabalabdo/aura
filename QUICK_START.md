@@ -127,4 +127,4 @@ npm install
 
 ---
 
-**استمتع باستخدام Aura AI Fashion Assistant!** ✨
+**استمتع باستخدام FitFusion AI Fashion Assistant!** ✨
