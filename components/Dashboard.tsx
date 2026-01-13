@@ -48,7 +48,7 @@ const Dashboard: React.FC<DashboardProps> = ({ items, orders, lang }) => {
       analysis: "تحليل الأسلوب",
       c1: "تماسك الخزانة",
       c2: "تناسق الألوان",
-      tipTitle: "نصيحة أورا",
+      tipTitle: "نصيحة فيت فيوجن",
       tip: "خزانتك تميل للألوان الهادئة. نقترح إضافة لون زمردي أو كحلي لكسر الرتابة وتنشيط مظهرك هذا الموسم.",
       status: "الحالة",
       statusLabels: {

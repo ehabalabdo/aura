@@ -31,7 +31,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
       logging: "Logging in..."
     },
     ar: {
-      title: "مرحباً بك في أورا",
+      title: "مرحباً بك في فيت فيوجن",
       sub: isAdminMode ? "دخول المدير الآمن" : "سجل دخولك لتبدأ رحلة الأناقة",
       userGoogle: "المتابعة باستخدام جوجل",
       adminToggle: "دخول المدير",
@@ -40,7 +40,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
       password: "كلمة المرور",
       login: "تسجيل الدخول",
       invalid: "بيانات غير صحيحة",
-      brand: "أورا لذكاء الأزياء",
+      brand: "فيت فيوجن الذكية",
       logging: "جاري تسجيل الدخول..."
     }
   }[lang];
