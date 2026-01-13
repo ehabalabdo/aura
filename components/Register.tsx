@@ -66,10 +66,14 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin, lang }) =
 
     setLoading(true);
 
+    console.log('[Register] Attempting registration...');
+
     try {
       // Create auth user
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const user = userCredential.user;
+      
+      console.log('[Register] User created:', user.uid);
 
       // Create Firestore document
       await setDoc(doc(db, 'users', user.uid), {
@@ -78,12 +82,37 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin, lang }) =
         role: 'user',
         createdAt: serverTimestamp()
       });
+      
+      console.log('[Register] Firestore document created successfully');
 
       // useAuth hook in App.tsx will handle redirect
       onClose();
     } catch (err: any) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registration failed');
+      console.error('[Register] Registration failed:', {
+        code: err.code,
+        message: err.message,
+        name: err.name
+      });
+      
+      // Display user-friendly error message
+      let errorMessage = 'Registration failed';
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = lang === 'en' 
+          ? 'Email already in use' 
+          : 'البريد الإلكتروني مستخدم بالفعل';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = lang === 'en' 
+          ? 'Invalid email address' 
+          : 'عنوان بريد إلكتروني غير صالح';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = t.weakPassword;
+      } else if (err.code === 'auth/network-request-failed') {
+        errorMessage = lang === 'en' 
+          ? 'Network error. Check your connection.' 
+          : 'خطأ في الاتصال. تحقق من الإنترنت.';
+      }
+      
+      setError(errorMessage);
       setLoading(false);
     }
   };

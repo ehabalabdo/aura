@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -9,5 +9,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize once in the Vite/React client (no Analytics in this setup)
-export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+// Validate configuration
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error('Firebase configuration is incomplete. Check environment variables.');
+}
+
+// Initialize Firebase app (singleton pattern)
+let app: FirebaseApp;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+  console.log('[Firebase] App initialized:', app.name);
+  console.log('[Firebase] Project ID:', app.options.projectId);
+} else {
+  app = getApp();
+  console.log('[Firebase] Using existing app:', app.name);
+}
+
+export const firebaseApp = app;

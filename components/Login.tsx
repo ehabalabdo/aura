@@ -45,13 +45,36 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
     setError('');
     setLoading(true);
 
+    console.log('[Login] Attempting sign in...');
+
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      console.log('[Login] Sign in successful:', userCredential.user.uid);
+      
       // useAuth hook in App.tsx will handle redirect
       onClose();
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || t.invalid);
+      console.error('[Login] Sign in failed:', {
+        code: err.code,
+        message: err.message,
+        name: err.name
+      });
+      
+      // Display user-friendly error message
+      let errorMessage = t.invalid;
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        errorMessage = t.invalid;
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = lang === 'en' 
+          ? 'Too many attempts. Please try again later.' 
+          : 'محاولات كثيرة جداً. حاول مرة أخرى لاحقاً.';
+      } else if (err.code === 'auth/network-request-failed') {
+        errorMessage = lang === 'en' 
+          ? 'Network error. Check your connection.' 
+          : 'خطأ في الاتصال. تحقق من الإنترنت.';
+      }
+      
+      setError(errorMessage);
       setLoading(false);
     }
   };
