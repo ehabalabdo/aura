@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../src/firebase/auth';
-import { Language } from '../types';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../src/firebase/db';
+import { Language, User } from '../types';
 
 interface LoginProps {
-  onClose: () => void;
+  onSuccess: (user: User) => void;
   onSwitchToRegister: () => void;
   lang: Language;
 }
 
-const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
+const Login: React.FC<LoginProps> = ({ onSuccess, onSwitchToRegister, lang }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,12 +48,19 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      onClose();
+      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const userData = userDoc.data();
+
+      if (userDoc.exists() && userData) {
+        onSuccess({ uid: user.uid, email: user.email || '', role: userData.role });
+      }
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || t.invalid);
-    } finally {
       setLoading(false);
     }
   };

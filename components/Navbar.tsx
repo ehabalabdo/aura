@@ -186,7 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               </svg>
             </button>
             <Login 
-              onClose={() => setShowLogin(false)} 
+              onSuccess={() => setShowLogin(false)} 
               onSwitchToRegister={() => { setShowLogin(false); setShowRegister(true); }}
               lang={lang}
             />
@@ -206,7 +206,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               </svg>
             </button>
             <Register 
-              onClose={() => setShowRegister(false)}
+              onSuccess={() => setShowRegister(false)}
               onSwitchToLogin={() => { setShowRegister(false); setShowLogin(true); }}
               lang={lang}
             />
