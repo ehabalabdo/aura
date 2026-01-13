@@ -79,10 +79,11 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin, lang }) =
         createdAt: serverTimestamp()
       });
 
-      // Don't call onClose - let App.tsx handle redirect
+      onClose();
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed');
+    } finally {
       setLoading(false);
     }
   };

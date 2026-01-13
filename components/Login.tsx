@@ -47,10 +47,11 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister, lang }) => {
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      // Don't call onClose - let App.tsx handle redirect
+      onClose();
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || t.invalid);
+    } finally {
       setLoading(false);
     }
   };
