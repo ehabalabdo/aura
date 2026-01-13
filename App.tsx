@@ -18,10 +18,10 @@ const App: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const S_PRODUCTS = 'aura_products_v4';
-  const S_CLOSET = 'aura_closet_v4';
-  const S_USER = 'aura_user_v4';
-  const S_ORDERS = 'aura_orders_v4';
+  const S_PRODUCTS = 'fitfusion_products_v4';
+  const S_CLOSET = 'fitfusion_closet_v4';
+  const S_USER = 'fitfusion_user_v4';
+  const S_ORDERS = 'fitfusion_orders_v4';
 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const saved = localStorage.getItem(S_USER);
@@ -154,9 +154,9 @@ const App: React.FC = () => {
       <main className="flex-grow">{renderView()}</main>
       <footer className="bg-white border-t border-gray-100 py-16 text-center">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="mb-4 font-display text-3xl text-gray-900 tracking-[0.4em]">AURA</p>
+          <p className="mb-4 font-display text-3xl text-gray-900 tracking-[0.4em]">FITFUSION</p>
           <div className="h-px w-20 bg-amber-200 mx-auto mb-6"></div>
-          <p className="text-gray-400 text-[10px] uppercase tracking-widest">© 2024 Aura Fashion AI</p>
+          <p className="text-gray-400 text-[10px] uppercase tracking-widest">© 2024 FitFusion AI</p>
         </div>
       </footer>
     </div>

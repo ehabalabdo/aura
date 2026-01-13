@@ -18,7 +18,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
 
   const t = {
     en: {
-      title: "Welcome to Aura",
+      title: "Welcome to FitFusion",
       sub: isAdminMode ? "Admin Secure Access" : "Sign in to start your styling journey",
       userGoogle: "Continue with Google",
       adminToggle: "Admin Login",
@@ -27,7 +27,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onLogin, lang }) => {
       password: "Password",
       login: "Login",
       invalid: "Invalid credentials",
-      brand: "AURA FASHION AI",
+      brand: "FITFUSION AI",
       logging: "Logging in..."
     },
     ar: {

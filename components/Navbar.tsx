@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
               onClick={() => setView(AppView.Home)}
               className="text-3xl font-display font-semibold tracking-[0.3em] cursor-pointer text-gray-900"
             >
-              AURA
+              FITFUSION
             </span>
             {user && (
               <span className="ml-4 rtl:mr-4 text-[9px] bg-gray-100 px-2 py-0.5 rounded text-gray-500 font-bold uppercase tracking-widest">

@@ -24,7 +24,7 @@ const Dashboard: React.FC<DashboardProps> = ({ items, orders, lang }) => {
       analysis: "Style Analysis",
       c1: "Closet Cohesion",
       c2: "Color Harmony",
-      tipTitle: "Aura Stylist Tip",
+      tipTitle: "FitFusion Stylist Tip",
       tip: "Your palette is neutral. Try adding emerald or navy to diversify your looks this season.",
       status: "Status",
       statusLabels: {

@@ -22,7 +22,7 @@ const Wardrobe: React.FC<WardrobeProps> = ({ items, setItems, lang }) => {
   const t = {
     en: {
       title: "The Digital Closet",
-      sub: "Aura analyzes every pixel to match your colors perfectly.",
+      sub: "FitFusion analyzes every pixel to match your colors perfectly.",
       askTitle: "Style Consultant",
       occLabel: "Occasion or Vibe",
       occPlace: "e.g., Casual brunch, formal gala, street style...",
