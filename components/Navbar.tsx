@@ -165,6 +165,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
                 </button>
               </>
             )}
+            <button 
+              onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
+              className="block w-full text-left rtl:text-right px-3 py-4 text-sm font-medium text-gray-600 border-b border-gray-50"
+            >
+              {lang === 'en' ? 'AR' : 'EN'}
+            </button>
             {user && (
               <button onClick={onLogout} className="block w-full text-left rtl:text-right px-3 py-4 text-sm font-medium text-red-500">
                 {lang === 'en' ? 'Logout' : 'تسجيل خروج'}
