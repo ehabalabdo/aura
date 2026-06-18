@@ -11,6 +11,8 @@ import Dashboard from './components/Dashboard';
 import AdminPortal from './components/AdminPortal';
 import CartModal from './components/CartModal';
 import { MARKET_PRODUCTS as INITIAL_PRODUCTS } from './constants';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from './src/firebase/db';
 
 const App: React.FC = () => {
   const { currentUser, loading: authLoading, setCurrentUser } = useAuth();
@@ -68,9 +70,29 @@ const App: React.FC = () => {
     }
   }, [currentUser, authLoading]);
 
+  // Load products from Firestore on mount (overrides localStorage)
+  const [firestoreLoaded, setFirestoreLoaded] = useState(false);
   useEffect(() => {
+    getDoc(doc(db, 'boutique', 'products'))
+      .then(snap => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (Array.isArray(data.items) && data.items.length > 0) {
+            setBoutiqueProducts(data.items);
+            localStorage.setItem(S_PRODUCTS, JSON.stringify(data.items));
+          }
+        }
+        setFirestoreLoaded(true);
+      })
+      .catch(() => setFirestoreLoaded(true));
+  }, []);
+
+  // Save products to Firestore + localStorage when they change (only after initial load)
+  useEffect(() => {
+    if (!firestoreLoaded) return;
     localStorage.setItem(S_PRODUCTS, JSON.stringify(boutiqueProducts));
-  }, [boutiqueProducts]);
+    setDoc(doc(db, 'boutique', 'products'), { items: boutiqueProducts }).catch(console.error);
+  }, [boutiqueProducts, firestoreLoaded]);
 
   useEffect(() => {
     localStorage.setItem(S_CLOSET, JSON.stringify(closetItems));

@@ -1,6 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import { MarketProduct, Language, Order } from '../types';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../src/firebase/storage';
 
 interface AdminPortalProps {
   products: MarketProduct[];
@@ -80,16 +82,26 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ products, setProducts, orders
     }
   }[lang];
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      // Fallback to base64 if Storage fails
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
-        setIsUploading(false);
       };
       reader.readAsDataURL(file);
+    } finally {
+      setIsUploading(false);
     }
   };
 
