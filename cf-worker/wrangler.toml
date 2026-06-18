@@ -1,0 +1,7 @@
+name = "aura-products-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "89e6d8f2df4e4c73a3272155109a464f"

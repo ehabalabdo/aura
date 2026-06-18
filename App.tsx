@@ -11,8 +11,9 @@ import Dashboard from './components/Dashboard';
 import AdminPortal from './components/AdminPortal';
 import CartModal from './components/CartModal';
 import { MARKET_PRODUCTS as INITIAL_PRODUCTS } from './constants';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './src/firebase/db';
+
+const CF_API = 'https://aura-products-api.loopehab.workers.dev';
+const CF_TOKEN = import.meta.env.VITE_CF_WRITE_TOKEN || '';
 
 const App: React.FC = () => {
   const { currentUser, loading: authLoading, setCurrentUser } = useAuth();
@@ -39,9 +40,7 @@ const App: React.FC = () => {
   const [boutiqueProducts, setBoutiqueProducts] = useState<MarketProduct[]>(() => {
     const saved = localStorage.getItem(S_PRODUCTS);
     if (saved !== null) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) { return INITIAL_PRODUCTS; }
+      try { return JSON.parse(saved); } catch (e) { return INITIAL_PRODUCTS; }
     }
     return INITIAL_PRODUCTS;
   });
@@ -70,29 +69,33 @@ const App: React.FC = () => {
     }
   }, [currentUser, authLoading]);
 
-  // Load products from Firestore on mount (overrides localStorage)
-  const [firestoreLoaded, setFirestoreLoaded] = useState(false);
+  // Load products from Cloudflare KV on mount (overrides localStorage)
+  const [cfLoaded, setCfLoaded] = useState(false);
   useEffect(() => {
-    getDoc(doc(db, 'boutique', 'products'))
-      .then(snap => {
-        if (snap.exists()) {
-          const data = snap.data();
-          if (Array.isArray(data.items) && data.items.length > 0) {
-            setBoutiqueProducts(data.items);
-            localStorage.setItem(S_PRODUCTS, JSON.stringify(data.items));
-          }
+    fetch(`${CF_API}/products`)
+      .then(r => r.json())
+      .then((items: MarketProduct[]) => {
+        if (Array.isArray(items) && items.length > 0) {
+          setBoutiqueProducts(items);
+          localStorage.setItem(S_PRODUCTS, JSON.stringify(items));
         }
-        setFirestoreLoaded(true);
+        setCfLoaded(true);
       })
-      .catch(() => setFirestoreLoaded(true));
+      .catch(() => setCfLoaded(true));
   }, []);
 
-  // Save products to Firestore + localStorage when they change (only after initial load)
+  // Save products to Cloudflare KV + localStorage when they change
   useEffect(() => {
-    if (!firestoreLoaded) return;
+    if (!cfLoaded) return;
     localStorage.setItem(S_PRODUCTS, JSON.stringify(boutiqueProducts));
-    setDoc(doc(db, 'boutique', 'products'), { items: boutiqueProducts }).catch(console.error);
-  }, [boutiqueProducts, firestoreLoaded]);
+    if (CF_TOKEN) {
+      fetch(`${CF_API}/products`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CF_TOKEN}` },
+        body: JSON.stringify(boutiqueProducts)
+      }).catch(console.error);
+    }
+  }, [boutiqueProducts, cfLoaded]);
 
   useEffect(() => {
     localStorage.setItem(S_CLOSET, JSON.stringify(closetItems));
