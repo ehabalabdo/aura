@@ -137,7 +137,9 @@ const App: React.FC = () => {
   };
 
   const renderView = () => {
-    if (!currentUser && currentView !== AppView.Home) {
+    // Public pages anyone can view without logging in
+    const PUBLIC_VIEWS = [AppView.Home, AppView.Boutique];
+    if (!currentUser && !PUBLIC_VIEWS.includes(currentView)) {
       return <div className="p-20 text-center font-display text-2xl">{language === 'ar' ? 'يرجى تسجيل الدخول' : 'Please Login'}</div>;
     }
 

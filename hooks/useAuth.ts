@@ -5,7 +5,9 @@ import { auth } from '../src/firebase/auth';
 import { db } from '../src/firebase/db';
 import { User } from '../types';
 
-const ADMIN_UID = import.meta.env.VITE_ADMIN_UID || 'hardcoded-admin-uid';
+// Admin is identified by email (with a hardcoded fallback so it works even if
+// the Vercel env var is missing). Comparison is case-insensitive.
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'aurajordan568@gmail.com').toLowerCase();
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -20,8 +22,8 @@ export const useAuth = () => {
       
       try {
         if (firebaseUser) {
-          // Check if user is admin by UID
-          const isAdmin = firebaseUser.uid === ADMIN_UID;
+          // Check if user is admin by email
+          const isAdmin = !!firebaseUser.email && firebaseUser.email.toLowerCase() === ADMIN_EMAIL;
           
           if (isAdmin) {
             console.log('[useAuth] User is admin');

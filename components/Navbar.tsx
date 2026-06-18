@@ -33,7 +33,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, lang, setLang, us
     { label: 'Home', labelAr: 'الرئيسية', view: AppView.Home, roles: ['admin', 'user', null] },
     { label: 'Wardrobe', labelAr: 'خزانتي', view: AppView.Wardrobe, roles: ['user'] },
     { label: 'Design', labelAr: 'تصميم', view: AppView.Atelier, roles: ['admin', 'user'] },
-    { label: 'Boutique', labelAr: 'المتجر', view: AppView.Boutique, roles: ['admin', 'user'] },
+    { label: 'Boutique', labelAr: 'المتجر', view: AppView.Boutique, roles: ['admin', 'user', null] },
     { label: 'Dashboard', labelAr: 'لوحتي', view: AppView.Dashboard, roles: ['user'] },
     { label: 'Admin Panel', labelAr: 'بوابة المدير', view: AppView.AdminPortal, roles: ['admin'] },
   ];
