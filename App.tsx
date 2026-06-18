@@ -13,7 +13,7 @@ import CartModal from './components/CartModal';
 import { MARKET_PRODUCTS as INITIAL_PRODUCTS } from './constants';
 
 const CF_API = 'https://aura-products-api.loopehab.workers.dev';
-const CF_TOKEN = import.meta.env.VITE_CF_WRITE_TOKEN || '';
+const CF_TOKEN = 'zBYkMumfhc6wxnFZXSTdOrqolEWVKsbp';
 
 const App: React.FC = () => {
   const { currentUser, loading: authLoading, setCurrentUser } = useAuth();
