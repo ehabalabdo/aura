@@ -84,22 +84,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ products, setProducts, orders
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
-    // Compress image via canvas before base64
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      const MAX = 800;
-      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      URL.revokeObjectURL(objectUrl);
-      setFormData(prev => ({ ...prev, imageUrl: dataUrl }));
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
       setIsUploading(false);
     };
-    img.src = objectUrl;
+    reader.onerror = () => setIsUploading(false);
+    reader.readAsDataURL(file);
   };
 
   const handleSave = () => {
