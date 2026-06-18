@@ -86,25 +86,59 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ products, setProducts, orders
     setIsUploading(true);
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
-      setIsUploading(false);
+      const src = reader.result as string;
+      // Downscale to keep payload small (KV value limit + faster site)
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const MAX = 1000;
+          let { width, height } = img;
+          if (width > MAX || height > MAX) {
+            if (width >= height) { height = Math.round(height * MAX / width); width = MAX; }
+            else { width = Math.round(width * MAX / height); height = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          const out = canvas.toDataURL('image/jpeg', 0.82);
+          setFormData(prev => ({ ...prev, imageUrl: out }));
+        } catch {
+          setFormData(prev => ({ ...prev, imageUrl: src }));
+        }
+        setIsUploading(false);
+      };
+      img.onerror = () => { setFormData(prev => ({ ...prev, imageUrl: src })); setIsUploading(false); };
+      img.src = src;
     };
     reader.onerror = () => setIsUploading(false);
     reader.readAsDataURL(file);
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.imageUrl || !formData.price) {
-        alert(lang === 'ar' ? "يرجى تعبئة الاسم والسعر والصورة" : "Please fill name, price and image");
-        return;
+    // Accept a name in EITHER language; mirror the missing one automatically
+    const nameEn = (formData.name || formData.nameAr || '').trim();
+    const nameAr = (formData.nameAr || formData.name || '').trim();
+    const missing: string[] = [];
+    if (!nameEn) missing.push(lang === 'ar' ? "الاسم" : "name");
+    if (!formData.price) missing.push(lang === 'ar' ? "السعر" : "price");
+    if (!formData.imageUrl) missing.push(lang === 'ar' ? "الصورة" : "image");
+    if (isUploading) {
+      alert(lang === 'ar' ? "الصورة قيد التحميل، انتظر لحظة..." : "Image is still uploading, please wait...");
+      return;
     }
-    
+    if (missing.length) {
+      alert((lang === 'ar' ? "يرجى تعبئة: " : "Please fill: ") + missing.join(lang === 'ar' ? "، " : ", "));
+      return;
+    }
+
+    const payload = { ...formData, name: nameEn, nameAr } as MarketProduct;
     if (editingId) {
-      setProducts(prev => prev.map(p => p.id === editingId ? { ...p, ...formData } as MarketProduct : p));
+      setProducts(prev => prev.map(p => p.id === editingId ? { ...p, ...payload } : p));
     } else {
       const newProd: MarketProduct = {
         id: 'p-' + Date.now(),
-        ...formData
+        ...payload
       } as MarketProduct;
       setProducts(prev => [newProd, ...prev]);
     }
